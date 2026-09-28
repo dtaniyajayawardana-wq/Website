@@ -1,25 +1,30 @@
 /* =========================================================
-   TANIYA JAYAWARDENA — PORTFOLIO
-   script.js
-   ========================================================= */
+   TANIYA JAYAWARDENA
+   PORTFOLIO — CLEAN JAVASCRIPT
+========================================================= */
 
-   document.addEventListener("DOMContentLoaded", () => {
-
-    /* =====================================================
-       01. SETTINGS
-       ===================================================== */
-
-    const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-    ).matches;
-
+document.addEventListener("DOMContentLoaded", () => {
 
     /* =====================================================
-       02. CURRENT YEAR
-       ===================================================== */
+       ELEMENTS
+    ===================================================== */
+
+    const header =
+        document.getElementById("siteHeader");
+
+    const navToggle =
+        document.getElementById("navToggle");
+
+    const mobileMenu =
+        document.getElementById("mobileMenu");
 
     const currentYear =
         document.getElementById("currentYear");
+
+
+    /* =====================================================
+       YEAR
+    ===================================================== */
 
     if (currentYear) {
         currentYear.textContent =
@@ -28,21 +33,20 @@
 
 
     /* =====================================================
-       03. HEADER
-       ===================================================== */
+       HEADER SCROLL
+    ===================================================== */
 
-    const header =
-        document.getElementById("siteHeader");
+    function updateHeader() {
 
-    const updateHeader = () => {
-
-        if (!header) return;
+        if (!header) {
+            return;
+        }
 
         header.classList.toggle(
             "scrolled",
             window.scrollY > 20
         );
-    };
+    }
 
     updateHeader();
 
@@ -54,94 +58,110 @@
 
 
     /* =====================================================
-       04. MOBILE NAVIGATION
-       ===================================================== */
+       MOBILE MENU
+    ===================================================== */
 
-    const navToggle =
-        document.getElementById("navToggle");
+    function openMobileMenu() {
 
-    const navMenu =
-        document.getElementById("navMenu");
+        if (!navToggle || !mobileMenu) {
+            return;
+        }
 
+        navToggle.classList.add(
+            "is-open"
+        );
 
-    const openMenu = () => {
-
-        if (!navToggle || !navMenu) return;
-
-        navToggle.classList.add("is-open");
-        navMenu.classList.add("is-open");
+        mobileMenu.classList.add(
+            "is-open"
+        );
 
         navToggle.setAttribute(
             "aria-expanded",
             "true"
         );
 
+        mobileMenu.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
         document.body.classList.add(
             "menu-open"
         );
-    };
+    }
 
 
-    const closeMenu = () => {
+    function closeMobileMenu() {
 
-        if (!navToggle || !navMenu) return;
+        if (!navToggle || !mobileMenu) {
+            return;
+        }
 
-        navToggle.classList.remove("is-open");
-        navMenu.classList.remove("is-open");
+        navToggle.classList.remove(
+            "is-open"
+        );
+
+        mobileMenu.classList.remove(
+            "is-open"
+        );
 
         navToggle.setAttribute(
             "aria-expanded",
             "false"
         );
 
+        mobileMenu.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
         document.body.classList.remove(
             "menu-open"
         );
-    };
+    }
 
 
-    const toggleMenu = () => {
+    function toggleMobileMenu() {
 
-        if (!navToggle || !navMenu) return;
+        if (!mobileMenu) {
+            return;
+        }
 
         if (
-            navMenu.classList.contains(
+            mobileMenu.classList.contains(
                 "is-open"
             )
         ) {
-            closeMenu();
+            closeMobileMenu();
         } else {
-            openMenu();
+            openMobileMenu();
         }
-    };
+    }
 
 
     if (navToggle) {
 
         navToggle.addEventListener(
             "click",
-            (event) => {
-
-                event.stopPropagation();
-
-                toggleMenu();
-            }
+            toggleMobileMenu
         );
     }
 
 
-    if (navMenu) {
+    if (mobileMenu) {
 
-        navMenu
-            .querySelectorAll("a")
-            .forEach((link) => {
+        const menuLinks =
+            mobileMenu.querySelectorAll(
+                "a"
+            );
 
-                link.addEventListener(
-                    "click",
-                    closeMenu
-                );
+        menuLinks.forEach((link) => {
 
-            });
+            link.addEventListener(
+                "click",
+                closeMobileMenu
+            );
+        });
     }
 
 
@@ -150,27 +170,16 @@
         () => {
 
             if (window.innerWidth > 980) {
-                closeMenu();
-            }
-        }
-    );
-
-
-    document.addEventListener(
-        "keydown",
-        (event) => {
-
-            if (event.key === "Escape") {
-                closeMenu();
+                closeMobileMenu();
             }
         }
     );
 
 
     /* =====================================================
-       05. PROFILE PHOTO SLIDER
-       EXACTLY 5 SECONDS
-       ===================================================== */
+       PROFILE SLIDER
+       ALWAYS ROTATES EVERY 5 SECONDS
+    ===================================================== */
 
     const profileSlides =
         Array.from(
@@ -186,25 +195,20 @@
             )
         );
 
-
     const PROFILE_INTERVAL = 5000;
 
     let currentProfileIndex = 0;
     let profileTimer = null;
 
 
-    /*
-       Force every portrait to load immediately.
-
-       These three images should NEVER be lazy loaded.
-    */
+    /* Preload every profile image */
 
     profileSlides.forEach((slide) => {
 
         slide.loading = "eager";
-        slide.decoding = "async";
 
-        const preload = new Image();
+        const preload =
+            new Image();
 
         preload.src =
             slide.currentSrc ||
@@ -212,9 +216,11 @@
     });
 
 
-    const showProfileSlide = (index) => {
+    function showProfileSlide(index) {
 
-        if (!profileSlides.length) return;
+        if (!profileSlides.length) {
+            return;
+        }
 
         currentProfileIndex =
             (
@@ -266,10 +272,10 @@
                 );
             }
         );
-    };
+    }
 
 
-    const stopProfileSlider = () => {
+    function stopProfileRotation() {
 
         if (profileTimer !== null) {
 
@@ -279,20 +285,12 @@
 
             profileTimer = null;
         }
-    };
+    }
 
 
-    /*
-       setTimeout is used instead of setInterval.
+    function scheduleProfileRotation() {
 
-       Each successful change creates the next
-       5-second countdown. This avoids overlapping
-       timers after indicator clicks/tab changes.
-    */
-
-    const scheduleNextProfile = () => {
-
-        stopProfileSlider();
+        stopProfileRotation();
 
         if (profileSlides.length < 2) {
             return;
@@ -306,25 +304,21 @@
                         currentProfileIndex + 1
                     );
 
-                    scheduleNextProfile();
+                    scheduleProfileRotation();
 
                 },
                 PROFILE_INTERVAL
             );
-    };
-
-
-    if (profileSlides.length) {
-
-        showProfileSlide(0);
-
-        scheduleNextProfile();
     }
 
 
-    /*
-       Manual indicator controls
-    */
+    if (profileSlides.length > 0) {
+
+        showProfileSlide(0);
+
+        scheduleProfileRotation();
+    }
+
 
     profileIndicators.forEach(
         (indicator, index) => {
@@ -333,45 +327,28 @@
                 "click",
                 () => {
 
-                    let requestedIndex =
+                    const requestedIndex =
                         Number(
                             indicator.dataset.index
                         );
 
-
-                    if (
-                        !Number.isInteger(
+                    const safeIndex =
+                        Number.isInteger(
                             requestedIndex
-                        ) ||
-                        requestedIndex < 0 ||
-                        requestedIndex >=
-                            profileSlides.length
-                    ) {
-                        requestedIndex = index;
-                    }
-
+                        )
+                            ? requestedIndex
+                            : index;
 
                     showProfileSlide(
-                        requestedIndex
+                        safeIndex
                     );
 
-                    scheduleNextProfile();
+                    scheduleProfileRotation();
                 }
             );
         }
     );
 
-
-    /*
-       Pause only while the tab is actually hidden.
-
-       IMPORTANT:
-       We do NOT disable the carousel because of
-       prefers-reduced-motion. Your previous script
-       did that, which can make the photos appear
-       permanently stuck for users/devices with that
-       preference enabled.
-    */
 
     document.addEventListener(
         "visibilitychange",
@@ -379,111 +356,84 @@
 
             if (document.hidden) {
 
-                stopProfileSlider();
+                stopProfileRotation();
 
             } else {
 
-                scheduleNextProfile();
+                scheduleProfileRotation();
             }
         }
     );
 
 
     /* =====================================================
-       06. ROTATING PROFESSIONAL ROLE
-       ===================================================== */
+       PROFESSIONAL ROLE ROTATION
+    ===================================================== */
 
     const changingRole =
         document.getElementById(
             "changingRole"
         );
 
-
-    const professionalRoles = [
+    const roles = [
         "Business Analysis",
         "Systems & Application Support",
         "Enterprise Technology",
         "Software Development"
     ];
 
-
-    let currentRoleIndex = 0;
-
-
-    const changeRole = () => {
-
-        if (!changingRole) return;
-
-        changingRole.classList.add(
-            "role-out"
-        );
+    let roleIndex = 0;
 
 
-        window.setTimeout(
+    if (changingRole) {
+
+        window.setInterval(
             () => {
 
-                currentRoleIndex =
-                    (
-                        currentRoleIndex + 1
-                    ) %
-                    professionalRoles.length;
-
-
-                changingRole.textContent =
-                    professionalRoles[
-                        currentRoleIndex
-                    ];
-
-
-                changingRole.classList.remove(
+                changingRole.classList.add(
                     "role-out"
                 );
 
+                window.setTimeout(
+                    () => {
+
+                        roleIndex =
+                            (
+                                roleIndex + 1
+                            ) %
+                            roles.length;
+
+                        changingRole.textContent =
+                            roles[roleIndex];
+
+                        changingRole.classList.remove(
+                            "role-out"
+                        );
+
+                    },
+                    220
+                );
+
             },
-            220
-        );
-    };
-
-
-    if (
-        changingRole &&
-        !reduceMotion
-    ) {
-
-        window.setInterval(
-            changeRole,
             3200
         );
     }
 
 
     /* =====================================================
-       07. REVEAL ON SCROLL
-       ===================================================== */
+       REVEAL ON SCROLL
+    ===================================================== */
 
-    const revealElements =
-        Array.from(
-            document.querySelectorAll(
-                ".reveal"
-            )
+    const revealItems =
+        document.querySelectorAll(
+            ".reveal"
         );
 
 
     if (
-        reduceMotion ||
-        !("IntersectionObserver" in window)
+        "IntersectionObserver"
+        in window
     ) {
-
-        revealElements.forEach(
-            (element) => {
-
-                element.classList.add(
-                    "is-visible"
-                );
-            }
-        );
-
-    } else {
 
         const revealObserver =
             new IntersectionObserver(
@@ -508,21 +458,33 @@
                             }
                         }
                     );
+
                 },
                 {
-                    threshold: 0.12,
+                    threshold: 0.08,
 
                     rootMargin:
-                        "0px 0px -45px 0px"
+                        "0px 0px -35px 0px"
                 }
             );
 
 
-        revealElements.forEach(
-            (element) => {
+        revealItems.forEach(
+            (item) => {
 
                 revealObserver.observe(
-                    element
+                    item
+                );
+            }
+        );
+
+    } else {
+
+        revealItems.forEach(
+            (item) => {
+
+                item.classList.add(
+                    "is-visible"
                 );
             }
         );
@@ -530,200 +492,136 @@
 
 
     /* =====================================================
-       08. SMOOTH INTERNAL NAVIGATION
-       ===================================================== */
+       SMOOTH INTERNAL LINKS
+    ===================================================== */
 
-    const internalLinks =
-        document.querySelectorAll(
+    document
+        .querySelectorAll(
             'a[href^="#"]'
-        );
+        )
+        .forEach((link) => {
 
+            link.addEventListener(
+                "click",
+                (event) => {
 
-    internalLinks.forEach((link) => {
+                    const href =
+                        link.getAttribute(
+                            "href"
+                        );
 
-        link.addEventListener(
-            "click",
-            (event) => {
+                    if (
+                        !href ||
+                        href === "#"
+                    ) {
+                        return;
+                    }
 
-                const href =
-                    link.getAttribute(
-                        "href"
-                    );
-
-
-                if (
-                    !href ||
-                    href === "#"
-                ) {
-                    return;
-                }
-
-
-                let target = null;
-
-
-                try {
-
-                    target =
+                    const target =
                         document.querySelector(
                             href
                         );
 
-                } catch (error) {
+                    if (!target) {
+                        return;
+                    }
 
-                    return;
+                    event.preventDefault();
+
+                    closeMobileMenu();
+
+                    target.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
                 }
-
-
-                if (!target) return;
-
-
-                event.preventDefault();
-
-
-                target.scrollIntoView({
-                    behavior:
-                        reduceMotion
-                            ? "auto"
-                            : "smooth",
-
-                    block: "start"
-                });
-
-
-                closeMenu();
-            }
-        );
-    });
-
-
-    /* =====================================================
-       09. ACTIVE NAVIGATION
-       ===================================================== */
-
-    const navLinks =
-        Array.from(
-            document.querySelectorAll(
-                '.nav-menu a[href^="#"]'
-            )
-        ).filter((link) => {
-
-            const href =
-                link.getAttribute(
-                    "href"
-                );
-
-            return (
-                href &&
-                href !== "#"
             );
         });
 
 
-    const navigationSections =
-        navLinks
+    /* =====================================================
+       ACTIVE DESKTOP NAV
+    ===================================================== */
+
+    const desktopLinks =
+        Array.from(
+            document.querySelectorAll(
+                '.desktop-nav a[href^="#"]'
+            )
+        );
+
+    const sections =
+        desktopLinks
             .map((link) => {
 
-                const href =
+                const selector =
                     link.getAttribute(
                         "href"
                     );
 
-                try {
-
-                    return (
-                        document.querySelector(
-                            href
-                        )
-                    );
-
-                } catch (error) {
-
-                    return null;
-                }
+                return document.querySelector(
+                    selector
+                );
             })
             .filter(Boolean);
 
 
-    const setActiveNavigation =
-        (sectionId) => {
+    function updateActiveNavigation() {
 
-            navLinks.forEach(
-                (link) => {
+        if (!sections.length) {
+            return;
+        }
 
-                    link.classList.toggle(
-                        "active",
-                        link.getAttribute(
-                            "href"
-                        ) ===
-                        `#${sectionId}`
-                    );
-                }
-            );
-        };
+        const offset = 160;
+
+        let currentSection =
+            sections[0];
 
 
-    if (
-        navigationSections.length &&
-        "IntersectionObserver" in window
-    ) {
-
-        const navigationObserver =
-            new IntersectionObserver(
-                (entries) => {
-
-                    const visibleEntries =
-                        entries
-                            .filter(
-                                (entry) =>
-                                    entry.isIntersecting
-                            )
-                            .sort(
-                                (a, b) =>
-                                    b.intersectionRatio -
-                                    a.intersectionRatio
-                            );
-
-
-                    if (
-                        visibleEntries.length
-                    ) {
-
-                        setActiveNavigation(
-                            visibleEntries[0]
-                                .target
-                                .id
-                        );
-                    }
-                },
-                {
-                    rootMargin:
-                        "-30% 0px -58% 0px",
-
-                    threshold: [
-                        0,
-                        0.05,
-                        0.1,
-                        0.2
-                    ]
-                }
-            );
-
-
-        navigationSections.forEach(
+        sections.forEach(
             (section) => {
 
-                navigationObserver.observe(
-                    section
+                const rect =
+                    section.getBoundingClientRect();
+
+                if (
+                    rect.top <= offset
+                ) {
+                    currentSection =
+                        section;
+                }
+            }
+        );
+
+
+        desktopLinks.forEach(
+            (link) => {
+
+                link.classList.toggle(
+                    "active",
+
+                    link.getAttribute(
+                        "href"
+                    ) ===
+                    `#${currentSection.id}`
                 );
             }
         );
     }
 
 
+    updateActiveNavigation();
+
+    window.addEventListener(
+        "scroll",
+        updateActiveNavigation,
+        { passive: true }
+    );
+
+
     /* =====================================================
-       10. PROJECT LIGHTBOX
-       ===================================================== */
+       PROJECT LIGHTBOX
+    ===================================================== */
 
     const lightbox =
         document.getElementById(
@@ -735,58 +633,30 @@
             "lightboxImage"
         );
 
-    const lightboxCaption =
-        document.getElementById(
-            "lightboxCaption"
-        );
-
     const lightboxClose =
         document.getElementById(
             "lightboxClose"
         );
 
 
-    const galleryItems =
-        Array.from(
-            document.querySelectorAll(
-                ".project-main-image, .gallery-item"
-            )
-        );
-
-
-    let previousBodyOverflow = "";
-
-
-    const openLightbox = (
-        imageSource,
-        imageAlt = ""
-    ) => {
+    function openLightbox(
+        source,
+        alt = ""
+    ) {
 
         if (
             !lightbox ||
             !lightboxImage ||
-            !imageSource
+            !source
         ) {
             return;
         }
 
-
         lightboxImage.src =
-            imageSource;
+            source;
 
         lightboxImage.alt =
-            imageAlt;
-
-
-        if (lightboxCaption) {
-
-            lightboxCaption.textContent =
-                "";
-
-            lightboxCaption.style.display =
-                "none";
-        }
-
+            alt;
 
         lightbox.classList.add(
             "is-open"
@@ -797,32 +667,16 @@
             "false"
         );
 
-
-        previousBodyOverflow =
-            document.body.style.overflow;
-
         document.body.style.overflow =
             "hidden";
+    }
 
 
-        if (lightboxClose) {
+    function closeLightbox() {
 
-            window.setTimeout(
-                () => {
-
-                    lightboxClose.focus();
-
-                },
-                50
-            );
+        if (!lightbox) {
+            return;
         }
-    };
-
-
-    const closeLightbox = () => {
-
-        if (!lightbox) return;
-
 
         lightbox.classList.remove(
             "is-open"
@@ -833,10 +687,8 @@
             "true"
         );
 
-
         document.body.style.overflow =
-            previousBodyOverflow;
-
+            "";
 
         if (lightboxImage) {
 
@@ -852,82 +704,41 @@
 
                         lightboxImage.src =
                             "";
-
-                        lightboxImage.alt =
-                            "";
                     }
                 },
-                220
+                200
             );
         }
-    };
+    }
 
 
-    galleryItems.forEach((item) => {
+    document
+        .querySelectorAll(
+            ".gallery-trigger"
+        )
+        .forEach((button) => {
 
-        const activateGalleryItem =
-            () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const image =
-                    item.querySelector(
-                        "img"
+                    const image =
+                        button.querySelector(
+                            "img"
+                        );
+
+                    const source =
+                        button.dataset.image ||
+                        image?.currentSrc ||
+                        image?.src;
+
+                    openLightbox(
+                        source,
+                        image?.alt || ""
                     );
-
-                if (!image) return;
-
-
-                openLightbox(
-                    image.currentSrc ||
-                    image.src,
-
-                    image.alt || ""
-                );
-            };
-
-
-        item.addEventListener(
-            "click",
-            activateGalleryItem
-        );
-
-
-        const tagName =
-            item.tagName.toLowerCase();
-
-
-        if (
-            tagName !== "button" &&
-            tagName !== "a"
-        ) {
-
-            item.setAttribute(
-                "role",
-                "button"
-            );
-
-            item.setAttribute(
-                "tabindex",
-                "0"
-            );
-
-
-            item.addEventListener(
-                "keydown",
-                (event) => {
-
-                    if (
-                        event.key === "Enter" ||
-                        event.key === " "
-                    ) {
-
-                        event.preventDefault();
-
-                        activateGalleryItem();
-                    }
                 }
             );
-        }
-    });
+        });
 
 
     if (lightboxClose) {
@@ -949,7 +760,6 @@
                     event.target ===
                     lightbox
                 ) {
-
                     closeLightbox();
                 }
             }
@@ -957,29 +767,34 @@
     }
 
 
+    /* =====================================================
+       ESCAPE KEY
+    ===================================================== */
+
     document.addEventListener(
         "keydown",
         (event) => {
 
-            if (event.key === "Escape") {
-
-                closeLightbox();
+            if (
+                event.key !==
+                "Escape"
+            ) {
+                return;
             }
+
+            closeMobileMenu();
+            closeLightbox();
         }
     );
 
 
     /* =====================================================
-       11. IMAGE LOADING
-       ===================================================== */
+       SAFETY: NON-PROFILE IMAGE LAZY LOADING
+    ===================================================== */
 
     document
         .querySelectorAll("img")
         .forEach((image) => {
-
-            /*
-               Never lazy-load profile carousel images.
-            */
 
             if (
                 image.matches(
@@ -990,12 +805,8 @@
                 image.loading =
                     "eager";
 
-                image.decoding =
-                    "async";
-
                 return;
             }
-
 
             if (
                 !image.hasAttribute(
@@ -1006,115 +817,6 @@
                 image.loading =
                     "lazy";
             }
-
-
-            image.decoding =
-                "async";
         });
-
-
-    /* =====================================================
-       12. NAVIGATION SCROLL FALLBACK
-       ===================================================== */
-
-    const updateNavigationFromScroll =
-        () => {
-
-            if (
-                !navigationSections.length
-            ) {
-                return;
-            }
-
-
-            const headerOffset =
-                (
-                    header
-                        ? header.offsetHeight
-                        : 80
-                ) + 80;
-
-
-            let activeSection =
-                navigationSections[0];
-
-
-            navigationSections.forEach(
-                (section) => {
-
-                    const rect =
-                        section.getBoundingClientRect();
-
-
-                    if (
-                        rect.top <=
-                        headerOffset
-                    ) {
-
-                        activeSection =
-                            section;
-                    }
-                }
-            );
-
-
-            if (activeSection) {
-
-                setActiveNavigation(
-                    activeSection.id
-                );
-            }
-        };
-
-
-    updateNavigationFromScroll();
-
-
-    let scrollTicking = false;
-
-
-    window.addEventListener(
-        "scroll",
-        () => {
-
-            if (scrollTicking) return;
-
-
-            scrollTicking = true;
-
-
-            window.requestAnimationFrame(
-                () => {
-
-                    updateNavigationFromScroll();
-
-                    scrollTicking = false;
-                }
-            );
-        },
-        { passive: true }
-    );
-
-
-    /* =====================================================
-       13. INITIAL ACCESSIBILITY STATES
-       ===================================================== */
-
-    if (navToggle) {
-
-        navToggle.setAttribute(
-            "aria-expanded",
-            "false"
-        );
-    }
-
-
-    if (lightbox) {
-
-        lightbox.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-    }
 
 });
